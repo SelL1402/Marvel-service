@@ -6,10 +6,11 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelServices';
 import AppBanner from '../appBanner/AppBanner';
 import { Helmet } from "react-helmet";
+import setContent from '../../utils/setContent';
 const SingleCharPage = () => {
     const {charId} = useParams();
     const [char, setChar] = useState("");
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
     
     useEffect(()=>{
         updateChar();
@@ -17,30 +18,23 @@ const SingleCharPage = () => {
     
     const updateChar = () =>{
         clearError();
-        console.log(char)
         getCharacter(charId)
             .then(onCharLoaded)
+            .then(()=> setProcess('confirmed'))
     }
     const onCharLoaded = (char) => {
         setChar(char);
     }
 
-    const errorMessage = error ? <ErrorMessage/> :null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !char) ? <View char={char}/> : null;
-
-
     return (
         <>
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, View, char)}
         </>
     )
 }
 
-const View = ({char}) => {
-    const {name, description, thumbnail,} = char;
+const View = ({data}) => {
+    const {name, description, thumbnail,} = data;
     
     return(
         <>
@@ -56,7 +50,7 @@ const View = ({char}) => {
                 <img src={thumbnail} alt={name} className="single-comic__img"/>
                 <div className="single-comic__info">
                     <h2 className="single-comic__name">{name}</h2>
-                    <p className="single-comic__descr">{description}</p>
+                    <p className="single-comic__descr">{description ? description : 'There is no description about this character'}</p>
                 </div>
                 <Link to="/" className="single-comic__back">Back to all</Link>
             </div>
