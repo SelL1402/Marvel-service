@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import useMarvelService from '../../services/MarvelServices';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import './charList.scss';
 
@@ -12,6 +13,7 @@ const CharList = (props) => {
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
+    const [showList, setShowList] = useState(true);
 
     
 
@@ -37,27 +39,35 @@ const CharList = (props) => {
         setCharEnded(charEnded => ended)
     }
     function renderItems(arr){
+        
         const items = arr.map((item, i) => {
             let imgStyle = {'objectFit' : 'cover'};
             if(item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg'){
                 imgStyle = {'objectFit' : 'unset'};
             }
-
+            
             return (
-                <li
-                    className='char__item'
-                    key={i}
-                    tabIndex={0}
-                    onClick={() => props.onCharSelected(item.id)}>
-                        <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
-                        <div className='char__name'>{item.name}</div>
-                </li>
+                <CSSTransition
+                    classNames="char__item"
+                    timeout={500}
+                    key={item.id}>
+                    <li
+                        className='char__item'
+                        key={i}
+                        tabIndex={0}
+                        onClick={() => props.onCharSelected(item.id)}>
+                            <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
+                            <div className='char__name'>{item.name}</div>
+                    </li>
+                </CSSTransition>
             )
         });
 
         return (
             <ul className='char__grid'>
-                {items}
+                <TransitionGroup component={null}>
+                    {items}
+                </TransitionGroup>
             </ul>
         )
     }
