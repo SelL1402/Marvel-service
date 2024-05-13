@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import useMarvelService from '../../services/MarvelServices';
 import Spinner from '../spinner/Spinner';
@@ -85,11 +85,13 @@ const CharList = (props) => {
             </ul>
         )
     }
-
+    const elements = useMemo(()=>{
+        return  setContent(process, () => renderItems(charlist), newItemLoading)
+    }, [process])
     
     return (
         <div className='char__list'>
-            {setContent(process, () => renderItems(charlist), newItemLoading)}
+            {elements}
             <button 
                 className='button button__main button__long'
                 disabled={newItemLoading}
